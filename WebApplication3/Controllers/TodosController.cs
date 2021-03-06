@@ -21,7 +21,7 @@ namespace WebApplication3.Controllers
 
         // GET: api/<TodosControllers>
         [HttpGet]
-        public ActionResult Get()
+        public ActionResult<IEnumerable<Todo>> GetAll ()
         {
             return Ok(todoRepository.List(20));
 
@@ -29,17 +29,17 @@ namespace WebApplication3.Controllers
 
         // GET api/<TodosControllers>/5
         [HttpGet("{id}")]
-        public ActionResult<Todo> Get(int id)
+        public ActionResult<Todo> GetById(int id)
         {
-            ActionResult<Todo> t = todoRepository.FindById(id);
-            if (t == null) return NotFound();
-            return t;
+            ActionResult<Todo> todo = todoRepository.FindById(id);
+            if (todo == null) return NotFound();
+            return todo;
         }
-
-        [HttpGet("{id}")]
-        public ActionResult Get(string text)
+        
+        [HttpGet("search")]
+        public ActionResult<IEnumerable<Todo>> SearchByTitle([FromQuery] string query)
         {
-            return Ok();
+            return Ok(todoRepository.Search(query));
         }
 
         // POST api/<TodosControllers>
@@ -59,7 +59,7 @@ namespace WebApplication3.Controllers
 
         // DELETE api/<TodosControllers>/5
         [HttpDelete("{id}")]
-        public void Delete(int id) //remove a todo with removeWhere(LAMZA) from the list
+        public void Delete(int id) 
         {
             todoRepository.RemoveInstance(id);
         }

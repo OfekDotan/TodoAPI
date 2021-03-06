@@ -12,5 +12,6 @@ namespace WebApplication3
       Todo FindById(int id);
         void Update(int id, Todo value);
         void RemoveInstance(int id);
+        IEnumerable<Todo> Search(string query);
     }
 }

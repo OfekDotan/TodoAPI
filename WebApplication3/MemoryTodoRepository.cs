@@ -27,8 +27,8 @@ namespace WebApplication3
 
         public Todo FindById(int id)
         {
-            foreach (Todo t in todos)
-                if (t.Id == id) return t;
+            foreach (Todo todo in todos)
+                if (todo.Id == id) return todo;
             return null;
         }
 
@@ -45,8 +45,19 @@ namespace WebApplication3
 
         public void RemoveInstance(int id)
         {
-            todos.RemoveWhere(t => t.Id == id);
+            todos.RemoveWhere(todo => todo.Id == id);
             
+        }
+
+        public IEnumerable<Todo> Search(string query)
+        {
+            HashSet<Todo> matchingTitles = new HashSet<Todo>();
+            foreach(Todo todo in todos)
+            {
+                if (todo.Title.StartsWith(query, System.StringComparison.CurrentCultureIgnoreCase))
+                    matchingTitles.Add(todo);
+            }
+            return matchingTitles;
         }
     }
 }
