@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApplication3
+namespace TodoAPI
 {
-    public interface ITodoRepository
-    {
-        void Add(Todo value);
+    public interface ITodoRepository {
+        int GetNextIdentity();
+        void Add(Todo todo);
         IEnumerable<Todo> List(int limit);
-      Todo FindById(int id);
-        void Update(int id, Todo value);
-        void RemoveInstance(int id);
+        Todo FindById(int id);
+        bool Remove(int id);
         IEnumerable<Todo> Search(string query);
     }
 }

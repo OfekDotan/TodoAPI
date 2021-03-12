@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace WebApplication3.Controllers
+namespace TodoAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -21,9 +21,10 @@ namespace WebApplication3.Controllers
 
         // GET: api/<TodosControllers>
         [HttpGet]
-        public ActionResult<IEnumerable<Todo>> GetAll ()
+        public ActionResult<IEnumerable<Todo>> GetAll ([FromQuery]int limit)
         {
-            return Ok(todoRepository.List(20));
+            if (limit > 100) return BadRequest();
+            return Ok(todoRepository.List(limit));
 
         }
 
@@ -32,7 +33,8 @@ namespace WebApplication3.Controllers
         public ActionResult<Todo> GetById(int id)
         {
             ActionResult<Todo> todo = todoRepository.FindById(id);
-            if (todo == null) return NotFound();
+            if (todo == null) 
+                return NotFound();
             return todo;
         }
         
@@ -44,34 +46,33 @@ namespace WebApplication3.Controllers
 
         // POST api/<TodosControllers>
         [HttpPost]
-        public void Create([FromBody] Todo value)
+        public IActionResult Create([FromBody] CreateTodoRequest RequestedTodo)
         {
-            todoRepository.Add(value);
+            int id = todoRepository.GetNextIdentity();
+            Todo todo = new Todo(id, RequestedTodo.Title);
+            todoRepository.Add(todo);
+            return CreatedAtAction(nameof(GetById), new { id = todo.Id }, todo);
         }
 
-        // PUT api/<TodosControllers>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] Todo value)
-        {
-            todoRepository.Update(id, value);
-
-        }
 
         // DELETE api/<TodosControllers>/5
         [HttpDelete("{id}")]
-        public void Delete(int id) 
+        public IActionResult Delete(int id) 
         {
-            todoRepository.RemoveInstance(id);
+            bool success=todoRepository.Remove(id);
+            if (success) 
+                return Ok();
+            return NotFound();
         }
         
         [HttpPut("{id}/title")]
         public IActionResult ChangeTitle(int id, [FromBody] string title)
         {
             var todo = todoRepository.FindById(id);
-            if (todo is null) return NotFound();
+            if (todo is null) 
+                return NotFound();
             todo.ChangeTitle(title);
 
-            todoRepository.Update(todo.Id,todo);
             return NoContent();
         }
 
@@ -79,24 +80,22 @@ namespace WebApplication3.Controllers
         public IActionResult MarkAsDone(int id)
         {
             var todo = todoRepository.FindById(id);
-            if (todo is null) return NotFound();
+            if (todo is null) 
+                return NotFound();
             todo.MarkAsDone();
 
-            todoRepository.Update(todo.Id,todo);
             return NoContent();
-
         }
 
         [HttpDelete("{id}/completeness")]
         public IActionResult MarkAsNotDone(int id)
         {
             var todo = todoRepository.FindById(id);
-            if (todo is null) return NotFound();
+            if (todo is null) 
+                return NotFound();
             todo.MarkAsNotDone();
 
-            todoRepository.Update(todo.Id,todo);
             return NoContent();
-                
         }
         
     }

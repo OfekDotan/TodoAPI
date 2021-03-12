@@ -3,61 +3,50 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApplication3
+namespace TodoAPI
 {
     public class MemoryTodoRepository : ITodoRepository
     {
         private static readonly HashSet<Todo> todos=new HashSet<Todo>();
         private static int nextId = 1;
-        public void Add(Todo value)
+        public int GetNextIdentity()
         {
-            value.Id = nextId++;
-            value.Completed = false;
-            todos.Add(value);
+            return nextId++;
         }
-
-        public void Update(int id, Todo value)
+        public void Add(Todo todo)
         {
-            if (FindById(id) is null) return;
-            RemoveInstance(id);
-            value.Id = id;
-            todos.Add(value);
-            
+
+            todos.Add(todo);
         }
 
         public Todo FindById(int id)
         {
-            foreach (Todo todo in todos)
-                if (todo.Id == id) return todo;
-            return null;
+            return todos.SingleOrDefault(t => t.Id == id);
         }
 
         public IEnumerable<Todo> List(int limit)
         {
-            if (limit <= 0) return null;
-          
-        
-            IEnumerable<Todo> returnValue = todos.Take(limit);
+           
+            if (limit < 0)
+                throw new ArgumentOutOfRangeException();
+
+             return todos.Take(limit);
             
-                
-            return returnValue;
         }
 
-        public void RemoveInstance(int id)
+        public bool Remove(int id)
         {
+            if (FindById(id) is null) 
+                return false;
             todos.RemoveWhere(todo => todo.Id == id);
-            
+            return true;    
         }
 
         public IEnumerable<Todo> Search(string query)
         {
-            HashSet<Todo> matchingTitles = new HashSet<Todo>();
-            foreach(Todo todo in todos)
-            {
-                if (todo.Title.StartsWith(query, System.StringComparison.CurrentCultureIgnoreCase))
-                    matchingTitles.Add(todo);
-            }
-            return matchingTitles;
+            return todos.Where(t => t.Title.Contains(query)).ToList();
         }
+
+       
     }
 }
