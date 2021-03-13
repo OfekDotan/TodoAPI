@@ -12,5 +12,7 @@ namespace TodoAPI
         Todo FindById(int id);
         bool Remove(int id);
         IEnumerable<Todo> Search(string query);
+        void Update(Todo todo);
+
     }
 }

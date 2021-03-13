@@ -1,4 +1,5 @@
-﻿using System;
+﻿/**
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +10,13 @@ namespace TodoAPI
     {
         private static readonly HashSet<Todo> todos=new HashSet<Todo>();
         private static int nextId = 1;
+        public void Update( Todo todo)
+        {
+            int id = todo.Id;
+            if (FindById(id) is null) return;
+            Remove(id);
+            todos.Add(todo);
+        }
         public int GetNextIdentity()
         {
             return nextId++;
@@ -50,3 +58,4 @@ namespace TodoAPI
        
     }
 }
+*/

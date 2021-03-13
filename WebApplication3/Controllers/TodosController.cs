@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,9 +22,10 @@ namespace TodoAPI.Controllers
 
         // GET: api/<TodosControllers>
         [HttpGet]
-        public ActionResult<IEnumerable<Todo>> GetAll ([FromQuery]int limit)
+        public ActionResult<IEnumerable<Todo>> GetAll ([Required,FromQuery]int limit)
         {
-            if (limit > 100) return BadRequest();
+            if (limit > 100)
+                return BadRequest();
             return Ok(todoRepository.List(limit));
 
         }
@@ -32,14 +34,14 @@ namespace TodoAPI.Controllers
         [HttpGet("{id}")]
         public ActionResult<Todo> GetById(int id)
         {
-            ActionResult<Todo> todo = todoRepository.FindById(id);
-            if (todo == null) 
+            var todo = todoRepository.FindById(id);
+            if (todo is null) 
                 return NotFound();
             return todo;
         }
         
         [HttpGet("search")]
-        public ActionResult<IEnumerable<Todo>> SearchByTitle([FromQuery] string query)
+        public ActionResult<IEnumerable<Todo>> SearchByTitle([Required,FromQuery] string query)
         {
             return Ok(todoRepository.Search(query));
         }
@@ -83,6 +85,7 @@ namespace TodoAPI.Controllers
             if (todo is null) 
                 return NotFound();
             todo.MarkAsDone();
+            todoRepository.Update(todo);
 
             return NoContent();
         }
@@ -94,6 +97,7 @@ namespace TodoAPI.Controllers
             if (todo is null) 
                 return NotFound();
             todo.MarkAsNotDone();
+            todoRepository.Update(todo);
 
             return NoContent();
         }

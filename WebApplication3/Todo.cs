@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace TodoAPI
 {
+ 
     public class Todo
     {
          public int Id { get; private set; }
@@ -20,6 +21,7 @@ namespace TodoAPI
         public void MarkAsDone()
         {
             Completed = true;
+
         }
         public void MarkAsNotDone()
         {
