@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 namespace TodoAPI
 {
     public interface ITodoRepository {
-        int GetNextIdentity();
-        void Add(Todo todo);
-        IEnumerable<Todo> List(int limit);
-        Todo FindById(int id);
-        bool Remove(int id);
-        IEnumerable<Todo> Search(string query);
-        void Update(Todo todo);
+        Task<int> GetNextIdentityAsync();
+        Task AddAsync(Todo todo);
+        Task<IEnumerable<Todo>> ListAsync(int limit);
+        Task<Todo> FindByIdAsync(int id);
+        Task<bool> RemoveAsync(int id);
+        Task<IEnumerable<Todo>> SearchAsync(string query);
+        Task UpdateAsync(Todo todo);
 
     }
 }

@@ -22,82 +22,81 @@ namespace TodoAPI.Controllers
 
         // GET: api/<TodosControllers>
         [HttpGet]
-        public ActionResult<IEnumerable<Todo>> GetAll ([FromQuery]int limit)
+        public async Task<ActionResult<IEnumerable<Todo>>> GetAllAsync ([FromQuery]int limit=20)
         {
-            if (limit == 0) limit = 20;
             if (limit > 100)
                 return BadRequest();
-            return Ok(todoRepository.List(limit));
+            return Ok(await todoRepository.ListAsync(limit));
 
         }
 
         // GET api/<TodosControllers>/5
         [HttpGet("{id}")]
-        public ActionResult<Todo> GetById(int id)
+        public async Task<ActionResult<Todo>> GetByIdAsync(int id)
         {
-            var todo = todoRepository.FindById(id);
+            var todo = await todoRepository.FindByIdAsync(id);
             if (todo is null) 
                 return NotFound();
             return todo;
         }
         
         [HttpGet("search")]
-        public ActionResult<IEnumerable<Todo>> SearchByTitle([Required,FromQuery] string query)
+        public async Task<ActionResult<IEnumerable<Todo>>> SearchByTitleAsync([Required,FromQuery] string query)
         {
-            return Ok(todoRepository.Search(query));
+            return Ok(await todoRepository.SearchAsync(query));
         }
 
         // POST api/<TodosControllers>
         [HttpPost]
-        public ActionResult<Todo> Create([FromBody] CreateTodoRequest RequestedTodo)
+        public async Task<ActionResult<Todo>> CreateAsync([FromBody] CreateTodoRequest RequestedTodo)
         {
-            int id = todoRepository.GetNextIdentity();
+            int id = await todoRepository.GetNextIdentityAsync();
             Todo todo = new Todo(id, RequestedTodo.Title);
-            todoRepository.Add(todo);
-            return CreatedAtAction(nameof(GetById), new { id = todo.Id }, todo);
+            await todoRepository.AddAsync(todo);
+            return CreatedAtAction("GetById", new { id = todo.Id }, todo);
         }
 
 
         // DELETE api/<TodosControllers>/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id) 
+        public async Task<IActionResult> DeleteAsync(int id) 
         {
-            bool success=todoRepository.Remove(id);
+            bool success=await todoRepository.RemoveAsync(id);
             if (success) 
                 return NoContent();
             return NotFound();
         }
         
         [HttpPut("{id}/title")]
-        public IActionResult ChangeTitle(int id, [FromBody] string title)
+        public async Task<IActionResult> ChangeTitleAsync(int id, [FromBody] string title)
         {
-            var todo = todoRepository.FindById(id);
+            var todo = await todoRepository.FindByIdAsync(id);
             if (todo is null) 
                 return NotFound();
             todo.ChangeTitle(title);
-            todoRepository.Update(todo);
+            await todoRepository.UpdateAsync(todo);
             return NoContent();
         }
 
         [HttpPut("{id}/completeness")] 
-        public IActionResult MarkAsDone(int id)
+        public async Task<IActionResult> MarkAsDoneAsync(int id)
         {
-            var todo = todoRepository.FindById(id);
+            var todo =await todoRepository.FindByIdAsync(id);
             if (todo is null) 
                 return NotFound();
             todo.MarkAsDone();
-            todoRepository.Update(todo);
+            await todoRepository.UpdateAsync(todo);
             return NoContent();
         }
 
         [HttpDelete("{id}/completeness")]
-        public IActionResult MarkAsNotDone(int id)
+        public async Task<IActionResult> MarkAsNotDoneAsync(int id)
         {
-            var todo = todoRepository.FindById(id);
+            var todo = await todoRepository.FindByIdAsync(id);
             if (todo is null) 
                 return NotFound();
             todo.MarkAsNotDone();
-            todoRepository.Update(todo);
+            await todoRepository.UpdateAsync(todo);
 
             return NoContent();
         }

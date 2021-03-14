@@ -4,71 +4,76 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text.Json;
+using System.Reflection;
 
 namespace TodoAPI
 {
     public class FileTodoRepository : ITodoRepository
     {
-        private const string Path = @"todos.json";
-        
-        public void Add(Todo todo)
+        private static readonly string TodosPath;
+        static FileTodoRepository()
         {
-            var todos = ReadAll();
+            var directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            TodosPath = directory+@"/todos.json";
+                }
+        public async Task AddAsync(Todo todo)
+        {
+            var todos = await ReadAllAsync();
             todos.Add(todo);
-            WriteAll(todos);
+            await WriteAllAsync(todos);
         }
 
-        public Todo FindById(int id)
+        public async Task<Todo> FindByIdAsync(int id)
         {
-            var todos = ReadAll();
+            var todos = await ReadAllAsync();
             return todos.SingleOrDefault(t => t.Id == id);
         }
 
-        public int GetNextIdentity()
+        public async Task<int> GetNextIdentityAsync()
         {
-            var todos = ReadAll();
+            var todos =await ReadAllAsync();
             if (todos.Count is 0)
                 return 1;
             return todos.Select(t => t.Id).Max() + 1;
         }
 
-        public IEnumerable<Todo> List(int limit)
+        public async Task<IEnumerable<Todo>> ListAsync(int limit)
         {
             if (limit < 0)
                 throw new ArgumentOutOfRangeException();
 
-            return ReadAll().Take(limit);
+            return (await ReadAllAsync()).Take(limit);
         }
 
-        public bool Remove(int id)
+        public async Task<bool> RemoveAsync(int id)
         {
-            var todos = ReadAll();
-            if (FindById(id) is null)
+            var todos =await ReadAllAsync();
+            if (FindByIdAsync(id) is null)
                 return false;
-            WriteAll(todos.Where(todo => todo.Id != id).ToList());
+           await WriteAllAsync(todos.Where(todo => todo.Id != id));
             return true;
         }
 
-        public IEnumerable<Todo> Search(string query)
+        public async Task<IEnumerable<Todo>> SearchAsync(string query)
         {
-            var todos = ReadAll();
+            var todos = await ReadAllAsync();
 
-            return todos.Where(todo => todo.Title.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
+            return todos.Where(todo => todo.Title.Contains(query, StringComparison.OrdinalIgnoreCase));
         }
 
-        public void Update(Todo todo)
+        public async Task UpdateAsync(Todo todo)
         {
-                var removed = Remove(todo.Id);
+                var removed = await RemoveAsync(todo.Id);
                 if (removed)
-                    Add(todo);
+                   await AddAsync(todo);
            
         }
-        private ICollection<Todo> ReadAll()
+        private async Task<ICollection<Todo>> ReadAllAsync()
         {
             string todos;
             try
             {
-                 todos = File.ReadAllText(Path);
+                todos=await File.ReadAllTextAsync(TodosPath);
             }
             catch (FileNotFoundException)
             {
@@ -76,10 +81,9 @@ namespace TodoAPI
             }
             return JsonSerializer.Deserialize<ICollection<Todo>>(todos);
         }
-        private void WriteAll(ICollection<Todo> todos)
+        private async Task WriteAllAsync(IEnumerable<Todo> todos)
         {
-            
-            File.WriteAllText(Path, JsonSerializer.Serialize(todos));
+           await File.WriteAllTextAsync(TodosPath, JsonSerializer.Serialize(todos));
         }
     }
 }

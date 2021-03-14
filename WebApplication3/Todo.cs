@@ -10,11 +10,11 @@ namespace TodoAPI
          public int Id { get;  }
         public string Title{ get; private set; }
         public bool Completed{ get; private set; }
-        public Todo(int id, string title)
+        public Todo(int id, string title,bool completed=false)
         {
             Id = id;
-            Completed = false;
             Title = title;
+            Completed = completed;
         }
         public void MarkAsDone()
         {
