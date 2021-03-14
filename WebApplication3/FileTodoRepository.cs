@@ -9,10 +9,9 @@ namespace TodoAPI
 {
     public class FileTodoRepository : ITodoRepository
     {
-       private const string Path = @"todos.json";
-        private static int nextId = 1;
+        private const string Path = @"todos.json";
+        
         public void Add(Todo todo)
-
         {
             var todos = ReadAll();
             todos.Add(todo);
@@ -28,7 +27,7 @@ namespace TodoAPI
         public int GetNextIdentity()
         {
             var todos = ReadAll();
-            if (todos.Count == 0)
+            if (todos.Count is 0)
                 return 1;
             return todos.Select(t => t.Id).Max() + 1;
         }
@@ -37,14 +36,13 @@ namespace TodoAPI
         {
             if (limit < 0)
                 throw new ArgumentOutOfRangeException();
-           
-            var todos = ReadAll();
-            return todos.Take(limit);
+
+            return ReadAll().Take(limit);
         }
 
         public bool Remove(int id)
         {
-             var todos = ReadAll();
+            var todos = ReadAll();
             if (FindById(id) is null)
                 return false;
             WriteAll(todos.Where(todo => todo.Id != id).ToList());
@@ -60,11 +58,10 @@ namespace TodoAPI
 
         public void Update(Todo todo)
         {
-            int id = todo.Id;
-            if (FindById(id) is null) 
-                return;
-            Remove(id);
-            Add(todo);
+                var removed = Remove(todo.Id);
+                if (removed)
+                    Add(todo);
+           
         }
         private ICollection<Todo> ReadAll()
         {
@@ -79,7 +76,7 @@ namespace TodoAPI
             }
             return JsonSerializer.Deserialize<ICollection<Todo>>(todos);
         }
-         private void WriteAll(ICollection<Todo> todos)
+        private void WriteAll(ICollection<Todo> todos)
         {
             
             File.WriteAllText(Path, JsonSerializer.Serialize(todos));

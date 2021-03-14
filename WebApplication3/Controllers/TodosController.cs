@@ -22,8 +22,9 @@ namespace TodoAPI.Controllers
 
         // GET: api/<TodosControllers>
         [HttpGet]
-        public ActionResult<IEnumerable<Todo>> GetAll ([Required,FromQuery]int limit)
+        public ActionResult<IEnumerable<Todo>> GetAll ([FromQuery]int limit)
         {
+            if (limit == 0) limit = 20;
             if (limit > 100)
                 return BadRequest();
             return Ok(todoRepository.List(limit));
@@ -48,7 +49,7 @@ namespace TodoAPI.Controllers
 
         // POST api/<TodosControllers>
         [HttpPost]
-        public IActionResult Create([FromBody] CreateTodoRequest RequestedTodo)
+        public ActionResult<Todo> Create([FromBody] CreateTodoRequest RequestedTodo)
         {
             int id = todoRepository.GetNextIdentity();
             Todo todo = new Todo(id, RequestedTodo.Title);
@@ -63,7 +64,7 @@ namespace TodoAPI.Controllers
         {
             bool success=todoRepository.Remove(id);
             if (success) 
-                return Ok();
+                return NoContent();
             return NotFound();
         }
         
@@ -74,7 +75,7 @@ namespace TodoAPI.Controllers
             if (todo is null) 
                 return NotFound();
             todo.ChangeTitle(title);
-
+            todoRepository.Update(todo);
             return NoContent();
         }
 
@@ -86,7 +87,6 @@ namespace TodoAPI.Controllers
                 return NotFound();
             todo.MarkAsDone();
             todoRepository.Update(todo);
-
             return NoContent();
         }
 

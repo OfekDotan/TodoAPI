@@ -10,7 +10,8 @@ namespace TodoAPI
     {
         private static readonly HashSet<Todo> todos=new HashSet<Todo>();
         private static int nextId = 1;
-        public void Update( Todo todo)
+        public void 
+( Todo todo)
         {
             int id = todo.Id;
             if (FindById(id) is null) return;
