@@ -5,8 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
-
-namespace TodoAPI
+using TodoApp.Domain; 
+namespace TodoApp.Storage
 {
     public class FileTodoRepository : ITodoRepository
     {
@@ -50,7 +50,8 @@ namespace TodoAPI
         public async Task<bool> RemoveAsync(int id)
         {
             var todos = await ReadAllAsync();
-            if (FindByIdAsync(id) is null)
+            var todo=await FindByIdAsync(id);
+            if (todo is null)
                 return false;
             await WriteAllAsync(todos.Where(todo => todo.Id != id));
             return true;

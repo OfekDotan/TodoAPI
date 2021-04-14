@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-
+using TodoApp.Application;
+using TodoApp.Domain;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace TodoAPI.Controllers
@@ -11,39 +12,38 @@ namespace TodoAPI.Controllers
     [ApiController]
     public class TodosController : ControllerBase
     {
-        private readonly ITodoRepository todoRepository;
+        private readonly TodoService todoService;
 
         public TodosController(ITodoRepository todoRepository)
         {
-            this.todoRepository = todoRepository;
+            
+            this.todoService = new TodoService(todoRepository);
         }
 
         [HttpPut("{id}/title")]
         public async Task<IActionResult> ChangeTitleAsync(int id, [FromBody] string title)
         {
-            var todo = await todoRepository.FindByIdAsync(id);
-            if (todo is null)
+            var success=await todoService.ChangeTitleAsync(id, title);
+            if (success)
+                return NoContent();
+            
                 return NotFound();
-            todo.ChangeTitle(title);
-            await todoRepository.UpdateAsync(todo);
-            return NoContent();
+
         }
 
         // POST api/<TodosControllers>
         [HttpPost]
-        public async Task<ActionResult<Todo>> CreateAsync([FromBody] CreateTodoRequest RequestedTodo)
+        public async Task<ActionResult<Todo>> CreateAsync([FromBody] CreateTodoRequest requestedTodo)
         {
-            var id = await todoRepository.GetNextIdentityAsync();
-            var todo = new Todo(id, RequestedTodo.Title);
-            await todoRepository.AddAsync(todo);
+            TodoDTO todo = await todoService.CreateAsync(requestedTodo);
             return CreatedAtAction("GetById", new { id = todo.Id }, todo);
         }
 
-        // DELETE api/<TodosControllers>/5
+        // DELETE api/<TodosControllers>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var success = await todoRepository.RemoveAsync(id);
+           var success = await todoService.RemoveAsync(id);
             if (success)
                 return NoContent();
             return NotFound();
@@ -51,42 +51,39 @@ namespace TodoAPI.Controllers
 
         // GET: api/<TodosControllers>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Todo>>> GetAllAsync([FromQuery] int limit = 20)
+        public async Task<ActionResult<IEnumerable<TodoDTO>>> GetAllAsync([FromQuery] int limit = 20)
         {
             if (limit > 100)
                 return BadRequest();
-            return Ok(await todoRepository.ListAsync(limit));
+            return Ok(await todoService.ListAsync(limit));
         }
 
         // GET api/<TodosControllers>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Todo>> GetByIdAsync(int id)
+        public async Task<ActionResult<TodoDTO>> GetByIdAsync(int id)
         {
-            var todo = await todoRepository.FindByIdAsync(id);
-            if (todo is null)
+            var todoDTO = await todoService.FindByIdAsync(id);
+            if (todoDTO is null)
                 return NotFound();
-            return todo;
+            return todoDTO;
         }
 
         [HttpPut("{id}/completeness")]
         public async Task<IActionResult> MarkAsDoneAsync(int id)
         {
-            var todo = await todoRepository.FindByIdAsync(id);
-            if (todo is null)
+            var success= await todoService.MarkAsDoneAsync(id);
+            if (!success)
                 return NotFound();
-            todo.MarkAsDone();
-            await todoRepository.UpdateAsync(todo);
+           
             return NoContent();
         }
 
         [HttpDelete("{id}/completeness")]
         public async Task<IActionResult> MarkAsNotDoneAsync(int id)
         {
-            var todo = await todoRepository.FindByIdAsync(id);
-            if (todo is null)
+            var success = await todoService.MarkAsNotDoneAsync(id);
+            if (!success)
                 return NotFound();
-            todo.MarkAsNotDone();
-            await todoRepository.UpdateAsync(todo);
 
             return NoContent();
         }
@@ -94,7 +91,7 @@ namespace TodoAPI.Controllers
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<Todo>>> SearchByTitleAsync([Required, FromQuery] string query)
         {
-            return Ok(await todoRepository.SearchAsync(query));
+            return Ok(await todoService.SearchAsync(query));
         }
     }
 }

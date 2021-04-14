@@ -1,4 +1,4 @@
-﻿namespace TodoAPI
+﻿namespace TodoApp.Application
 {
     public class CreateTodoRequest
     {

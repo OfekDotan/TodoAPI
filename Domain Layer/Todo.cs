@@ -1,4 +1,4 @@
-﻿namespace TodoAPI
+﻿namespace TodoApp.Domain
 {
     public class Todo
     {
@@ -9,7 +9,7 @@
             Completed = completed;
         }
 
-        public bool Completed { get; private set; }
+        public bool Completed { get;  private set; }
         public int Id { get; }
         public string Title { get; private set; }
 

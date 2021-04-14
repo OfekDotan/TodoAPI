@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace TodoAPI
+namespace TodoApp.Domain
 {
     public interface ITodoRepository
     {
