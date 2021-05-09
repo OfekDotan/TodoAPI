@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoApp.Application", "Todo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoApp.Domain", "Domain Layer\TodoApp.Domain.csproj", "{C534B8C6-BC66-43D0-A820-3D90F690D55A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoApp.Storage", "TodoApp.Storage\TodoApp.Storage.csproj", "{B1029437-E757-41DA-B249-BBEDDC101878}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoApp.Storage", "TodoApp.Storage\TodoApp.Storage.csproj", "{B1029437-E757-41DA-B249-BBEDDC101878}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "TodoDB", "TodoDB\TodoDB.sqlproj", "{86578A5C-F89F-4174-BECB-EACB0D8F3824}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,12 @@ Global
 		{B1029437-E757-41DA-B249-BBEDDC101878}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1029437-E757-41DA-B249-BBEDDC101878}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1029437-E757-41DA-B249-BBEDDC101878}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86578A5C-F89F-4174-BECB-EACB0D8F3824}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86578A5C-F89F-4174-BECB-EACB0D8F3824}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86578A5C-F89F-4174-BECB-EACB0D8F3824}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{86578A5C-F89F-4174-BECB-EACB0D8F3824}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86578A5C-F89F-4174-BECB-EACB0D8F3824}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86578A5C-F89F-4174-BECB-EACB0D8F3824}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,16 +4,18 @@ using System.Text;
 
 namespace TodoApp.Application
 {
-    public class TodoDTO
+    public class TodoDto
     {
-        private bool Completed { get; set; }
-        public int Id { get; }
+        public bool Completed { get; private set; }
+        public Guid Id { get; }
         public string Title { get; private set; }
+        public List<string> Tags { get; private set; }
 
-        public TodoDTO(int id, string title, bool completed = false)
+        public TodoDto(Guid id, string title, List<string> tags, bool completed)
         {
             Id = id;
             Title = title;
+            Tags = tags;
             Completed = completed;
         }
     }

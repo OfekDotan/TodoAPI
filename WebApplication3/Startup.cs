@@ -4,6 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using TodoApp.Storage;
+using TodoApp.Application;
+using Domain_Layer;
 
 namespace TodoAPI
 {
@@ -46,7 +49,9 @@ namespace TodoAPI
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoAPI", Version = "v1" });
             });
-            services.AddTransient<ITodoRepository, FileTodoRepository>();
+            services.AddTransient<ITodoRepository, SqlTodoRepsoitory>();
+            services.AddTransient<TodoService>();
+            services.AddTransient<SqlConnectionFactory>();
         }
     }
 }
