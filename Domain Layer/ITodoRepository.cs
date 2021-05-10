@@ -10,15 +10,15 @@ namespace Domain_Layer
 
         Task<Todo> FindByIdAsync(Guid id);
 
-        Task<IEnumerable<Todo>> ListAsync(int limit);
+        Task<IReadOnlyList<Todo>> ListAsync(int limit);
 
         Task<bool> RemoveAsync(Guid id);
 
-        Task<IEnumerable<Todo>> SearchAsync(string query);
+        Task<IReadOnlyList<Todo>> SearchAsync(string query);
 
         Task UpdateAsync(Todo todo);
-        Task AddTag(Tag tag);
-        Task<IEnumerable<Todo>> SearchTagAsync(string tag);
-        Task<bool> RemoveTag(Guid id, string tag);
+        Task AddTagAsync(Tag tag);
+        Task<IReadOnlyList<Todo>> SearchByTagAsync(string tag);
+        Task<bool> RemoveTagAsync(Guid id, string tag);
     }
 }

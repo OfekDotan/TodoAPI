@@ -25,12 +25,13 @@ namespace TodoApp.Application
         public async Task<TodoDto> CreateAsync(CreateTodoRequest requestedTodo)
         {
             var id = Guid.NewGuid();
-            List <Tag> temp= new List<Tag>();
+           
+            var todo = new Todo(id, requestedTodo.Title);
+
             foreach (var tag in requestedTodo.Tags)
             {
-                temp.Add(new Tag(Guid.NewGuid(), tag, id)); 
+                todo.AddTag(new Tag(Guid.NewGuid(), tag, id));
             }
-            var todo = new Todo(id, requestedTodo.Title, temp);
             await todoRepository.AddAsync(todo);
             return ConvertToDto(todo);
         }
@@ -38,7 +39,7 @@ namespace TodoApp.Application
         {
             var tagId = Guid.NewGuid();
             var tag = new Tag(tagId, requestTag.Tag, id);
-            await todoRepository.AddTag(tag);
+            await todoRepository.AddTagAsync(tag);
             return ConvertTagToDto(tag);
         }
         public async Task<bool> RemoveAsync(Guid id)
@@ -71,7 +72,7 @@ namespace TodoApp.Application
 
         public async Task<bool> removeTag(Guid id, string tag)
         {
-            return await todoRepository.RemoveTag(id, tag);
+            return await todoRepository.RemoveTagAsync(id, tag);
         }
 
         public async Task<bool> MarkAsNotDoneAsync(Guid id)
@@ -91,7 +92,7 @@ namespace TodoApp.Application
         public async Task<IEnumerable<TodoDto>> SearchTagAsync(string tag)
         {
 
-            var todos = await todoRepository.SearchTagAsync(tag);
+            var todos = await todoRepository.SearchByTagAsync(tag);
             return todos.Select(ConvertToDto);
         }
         private TodoDto ConvertToDto(Todo todo)
@@ -100,8 +101,8 @@ namespace TodoApp.Application
             string title = todo.Title;
             bool completed = todo.Completed;
             var tags = new List<string>();
-            if(!(todo.Tags is null))
-            foreach(Tag tag in todo.Tags)
+            if(!(todo.ReadTags is null))
+            foreach(Tag tag in todo.ReadTags)
             {
                     if(!(tag is null))
                 tags.Add(tag.Title);

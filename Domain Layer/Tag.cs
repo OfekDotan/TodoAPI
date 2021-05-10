@@ -20,5 +20,16 @@ namespace Domain_Layer
         {
             Title = title;
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Tag tag &&
+                   Id.Equals(tag.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id);
+        }
     }
 }

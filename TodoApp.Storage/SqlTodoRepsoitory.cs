@@ -26,7 +26,7 @@ namespace TodoApp.Storage
             Title=todo.Title,
             Completed=todo.Completed
             });
-            foreach(Tag tag in todo.Tags)
+            foreach(Tag tag in todo.ReadTags)
             {
                 await connection.ExecuteAsync(insertTags, new
                 {
@@ -37,7 +37,7 @@ namespace TodoApp.Storage
             }
         }
 
-        public async Task AddTag(Tag tag)
+        public async Task AddTagAsync(Tag tag)
         {
             string insertTag = "INSERT INTO Tags([TagId], [Tag], [TodoId]) VALUES (@Id, @Tag, @TodoId)";
             using var connection = connectionFactory.CreateConnection();
@@ -67,14 +67,14 @@ namespace TodoApp.Storage
                          todoEntry = todo;
                          todoDictionary.Add(todoEntry.Id, todoEntry);
                      }
-                     todoEntry.Tags.Add(tag);
+                     todoEntry.AddTag(tag);
                      return todoEntry;
                  }
               , new { id } , splitOn: "TagId")).Distinct().SingleOrDefault(todo=>todo.Id==id);
 
          
         }
-        public async Task<IEnumerable<Todo>> ListAsync(int limit)
+        public async Task<IReadOnlyList<Todo>> ListAsync(int limit)
         {
             if (limit < 0)
                 throw new ArgumentOutOfRangeException();
@@ -95,10 +95,10 @@ namespace TodoApp.Storage
                         todoEntry = todo;
                         todoDictionary.Add(todoEntry.Id, todoEntry);
                     }
-                    todoEntry.Tags.Add(tag);
+                    todoEntry.AddTag(tag);
                     return todoEntry;
                 }
-                , new { limit }, splitOn: "TagId")).Distinct().Take(limit);
+                , new { limit }, splitOn: "TagId")).Distinct().Take(limit).ToList();
             
 
           
@@ -112,7 +112,7 @@ namespace TodoApp.Storage
             return (changes > 0);
     }
 
-        public async Task<bool> RemoveTag(Guid id, string tag)
+        public async Task<bool> RemoveTagAsync(Guid id, string tag)
         {
             string deleteQuery = "DELETE FROM Tags WHERE TodoId=@id AND Tag=@tag";
             using var connection = connectionFactory.CreateConnection();
@@ -120,7 +120,7 @@ namespace TodoApp.Storage
             return (changes > 0);
         }
 
-        public async Task<IEnumerable<Todo>> SearchAsync(string query)
+        public async Task<IReadOnlyList<Todo>> SearchAsync(string query)
         {
             string selectQuery = "SELECT * FROM [dbo].[Todos] LEFT JOIN [dbo].[Tags] ON Todos.TodoId=Tags.TodoId WHERE Title LIKE '%' + @query + '%'";
             var todoDictionary = new Dictionary<Guid, Todo>();
@@ -136,15 +136,15 @@ namespace TodoApp.Storage
                         todoEntry = todo;
                         todoDictionary.Add(todoEntry.Id, todoEntry);
                     }
-                    todoEntry.Tags.Add(tag);
+                    todoEntry.AddTag(tag);
                     return todoEntry;
                 }
-                , new { query }, splitOn: "TagId")).Distinct();
+                , new { query }, splitOn: "TagId")).Distinct().ToList();
             
             
         }
 
-        public async Task<IEnumerable<Todo>> SearchTagAsync(string tagQuery)
+        public async Task<IReadOnlyList<Todo>> SearchByTagAsync(string tagQuery)
         {
             string selectQuery = "SELECT * FROM (SELECT [Todos].[TodoId],[Title],[Completed] FROM Todos LEFT JOIN Tags ON Todos.TodoId=Tags.TodoId WHERE Tag LIKE '%' + @tagQuery+ '%') AS t LEFT JOIN Tags On t.TodoId=Tags.TodoId ";
             var todoDictionary = new Dictionary<Guid, Todo>();
@@ -160,10 +160,10 @@ namespace TodoApp.Storage
               todoEntry = todo;
               todoDictionary.Add(todoEntry.Id, todoEntry);
           }
-          todoEntry.Tags.Add(tag);
+          todoEntry.AddTag(tag);
           return todoEntry;
       }
-      , new { tagQuery }, splitOn: "TagId")).Distinct();
+      , new { tagQuery }, splitOn: "TagId")).Distinct().ToList();
          
         }
 
@@ -178,7 +178,7 @@ namespace TodoApp.Storage
                 Completed = todo.Completed,
                 Id = todo.Id
             }) ;
-            foreach (var tag in todo.Tags) {
+            foreach (var tag in todo.ReadTags) {
                 if (tag is null) break;
                 await connection.ExecuteAsync(updateTagsQuery, new
                 {
